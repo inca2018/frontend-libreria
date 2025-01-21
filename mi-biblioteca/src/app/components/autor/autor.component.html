@@ -1,0 +1,89 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <h1 class="mb-4">Gestión de Autores</h1>
+
+  <!-- Formulario de autor -->
+  <form [formGroup]="autorForm" (ngSubmit)="submitForm()" class="mb-4">
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre:</label>
+      <input id="nombre" formControlName="nombre" class="form-control" />
+      <div *ngIf="autorForm.get('nombre')?.invalid && autorForm.get('nombre')?.touched" class="text-danger">
+        <div *ngIf="autorForm.get('nombre')?.hasError('required')">El nombre es obligatorio.</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="nacionalidad" class="form-label">Nacionalidad:</label>
+      <input id="nacionalidad" formControlName="nacionalidad" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+      <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento:</label>
+      <input id="fechaNacimiento" formControlName="fechaNacimiento" type="date" class="form-control" />
+      <div *ngIf="autorForm.get('fechaNacimiento')?.invalid && autorForm.get('fechaNacimiento')?.touched" class="text-danger">
+        <div *ngIf="autorForm.get('fechaNacimiento')?.hasError('required')">La fecha de nacimiento es obligatoria.</div>
+      </div>
+    </div>
+ 
+    <div class="mb-3 form-check">
+      <input id="status" formControlName="status" type="checkbox" class="form-check-input" />
+      <label for="status" class="form-check-label">Estado</label>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-primary" [disabled]="autorForm.invalid">{{ isEdit ? 'Actualizar' : 'Crear' }}</button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()">Cancelar</button>
+    </div>
+  </form>
+
+  <!-- Tabla de autores -->
+  <h2 class="mb-3">Lista de Autores</h2>
+  <div class="mb-3">
+    <label for="busqueda" class="form-label">Buscar Autor:</label>
+    <input
+      id="busqueda"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+      class="form-control"
+      placeholder="Buscar por nombre..."
+    />
+  </div>
+  
+  <div class="table-responsive mat-elevation-z8">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th> ID </th>
+          <th> Nombre </th>
+          <th> Nacionalidad </th>
+          <th> Fecha de Nacimiento </th>
+          <th> Estado </th>
+          <th> Acciones </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let autor of autores | paginate: { itemsPerPage: 10, currentPage: p }">
+          <td>{{ autor.id }}</td>
+          <td>{{ autor.nombre }}</td>
+          <td>{{ autor.nacionalidad }}</td>
+          <td>{{ autor.fechaNacimiento | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ autor.status ? 'Activo' : 'Inactivo' }}</td>
+          <td>
+            <button class="btn btn-warning m-2" (click)="editAutor(autor)">Editar</button>
+            <button class="btn btn-danger" (click)="deleteAutor(autor.id)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <pagination-controls 
+      (pageChange)="p = $event" 
+      [previousLabel]="'Anterior'" 
+      [nextLabel]="'Siguiente'" 
+      [screenReaderPaginationLabel]="'Paginación'" 
+      [screenReaderPageLabel]="'Página'"
+      [screenReaderCurrentLabel]="'Página actual'"
+    ></pagination-controls>
+
+  </div>
+</div>

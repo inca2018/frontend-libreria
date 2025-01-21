@@ -1,0 +1,119 @@
+
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+    <h1 class="mb-4">Gestión de Préstamos</h1>
+  
+      <!-- Formulario de libro -->
+  <form [formGroup]="prestamoForm" (ngSubmit)="submitForm()" class="mb-4">
+
+    <div class="mb-3">
+        <label for="usuario" class="form-label">Usuario:</label>
+        <select id="usuario" formControlName="usuario" class="form-select">
+          <option *ngFor="let usuario of usuarios" [value]="usuario.id">{{ usuario.nombre }}</option>
+        </select>
+        <div *ngIf="prestamoForm.get('usuario')?.invalid && prestamoForm.get('usuario')?.touched" class="text-danger">
+          <div *ngIf="prestamoForm.get('usuario')?.hasError('required')">El usuario es obligatorio.</div>
+        </div>
+      </div>
+
+    <div class="mb-3">
+      <label for="libro" class="form-label">Libro:</label>
+      <select id="libro" formControlName="libro" class="form-select">
+        <option *ngFor="let libro of libros" [value]="libro.id">{{ libro.titulo }}</option>
+      </select>
+      <div *ngIf="prestamoForm.get('libro')?.invalid && prestamoForm.get('libro')?.touched" class="text-danger">
+        <div *ngIf="prestamoForm.get('libro')?.hasError('required')">El libro es obligatorio.</div>
+      </div>
+    </div>
+    
+    <div class="mb-3">
+      <label for="fechaPrestamo" class="form-label">Fecha de Prestamo:</label>
+      <input id="fechaPrestamo" formControlName="fechaPrestamo" type="date" class="form-control" />
+      <div *ngIf="prestamoForm.get('fechaPrestamo')?.invalid && prestamoForm.get('fechaPrestamo')?.touched" class="text-danger">
+        <div *ngIf="prestamoForm.get('fechaPrestamo')?.hasError('required')">La fecha de prestamo es obligatoria.</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+        <label for="fechaDevolucion" class="form-label">Fecha de Devolucion:</label>
+        <input id="fechaDevolucion" formControlName="fechaDevolucion" type="date" class="form-control" />
+        <div *ngIf="prestamoForm.get('fechaDevolucion')?.invalid && prestamoForm.get('fechaDevolucion')?.touched" class="text-danger">
+          <div *ngIf="prestamoForm.get('fechaDevolucion')?.hasError('required')">La fecha de devolucion es obligatoria.</div>
+        </div>
+      </div>
+
+
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-primary" [disabled]="prestamoForm.invalid">{{ isEdit ? 'Actualizar' : 'Crear' }}</button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()">Cancelar</button>
+    </div>
+  </form>
+   
+  <h2 class="mb-3">Lista de Prestamos</h2>
+  <div class="mb-3">
+    <label for="busqueda" class="form-label">Buscar Presamo:</label>
+    <input
+      id="busqueda"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+      class="form-control"
+      placeholder="Buscar por título..."
+    />
+  </div>
+    
+    <div class="table-responsive mat-elevation-z8">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Libro</th>
+            <th>Autor</th>
+            <th>Usuario</th>
+            <th>Fecha de Préstamo</th>
+            <th>Fecha de Devolución</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prestamo of prestamos">
+            <td>{{ prestamo.id }}</td>
+            <td>{{ prestamo.libro.titulo }}</td>
+            <td>{{ prestamo.libro.autor.nombre }}</td>
+            <td>{{ prestamo.usuario.nombre }}</td>
+            <td>{{ prestamo.fechaPrestamo | date: 'dd/MM/yyyy' }}</td>
+            <td>{{ prestamo.fechaDevolucion | date: 'dd/MM/yyyy' }}</td>
+  
+            <td>{{ prestamo.estado }}</td>
+            <td class="text-center"> <!-- Clase para centrar los botones -->
+              <div class="d-flex justify-content-center gap-2">
+                <!-- Botón Finalizar con ícono -->
+                <button 
+                  class="btn btn-warning" 
+                  (click)="finalizarPrestamo(prestamo.id)" 
+                  *ngIf="prestamo.estado !== 'FINALIZADO'">
+                  <i class="fas fa-check-circle"></i> Finalizar
+                </button>
+        
+                <!-- Botón Eliminar con ícono -->
+                <button 
+                  class="btn btn-danger" 
+                  (click)="deletePrestamo(prestamo.id)"
+                  *ngIf="prestamo.estado !== 'ACTIVO'">
+                  <i class="fas fa-trash-alt"></i> Eliminar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <!-- Paginación -->
+      <pagination-controls 
+      (pageChange)="p = $event" 
+      [previousLabel]="'Anterior'" 
+      [nextLabel]="'Siguiente'" 
+    ></pagination-controls>
+    </div>
+  </div>
+  

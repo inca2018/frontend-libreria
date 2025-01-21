@@ -1,0 +1,112 @@
+<app-navbar></app-navbar>
+
+<div class="container mt-5">
+  <h1 class="mb-4">Gestión de Usuarios</h1>
+
+  <!-- Formulario de usuario -->
+  <form [formGroup]="usuarioForm" (ngSubmit)="submitForm()" class="mb-4">
+    <div class="mb-3">
+      <label for="nombre" class="form-label">Nombre:</label>
+      <input id="nombre" formControlName="nombre" class="form-control" />
+      <div *ngIf="usuarioForm.get('nombre')?.invalid && usuarioForm.get('nombre')?.touched" class="text-danger">
+        <div *ngIf="usuarioForm.get('nombre')?.hasError('required')">El nombre es obligatorio.</div>
+        <div *ngIf="usuarioForm.get('nombre')?.hasError('minlength')">El nombre debe tener al menos 2 caracteres.</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="documento" class="form-label">Documento:</label>
+      <input id="documento" formControlName="documento" class="form-control" />
+      <div *ngIf="usuarioForm.get('documento')?.invalid && usuarioForm.get('documento')?.touched" class="text-danger">
+        <div *ngIf="usuarioForm.get('documento')?.hasError('required')">El documento es obligatorio.</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email:</label>
+      <input id="email" formControlName="email" type="email" class="form-control" />
+      <div *ngIf="usuarioForm.get('email')?.invalid && usuarioForm.get('email')?.touched" class="text-danger">
+        <div *ngIf="usuarioForm.get('email')?.hasError('required')">El email es obligatorio.</div>
+        <div *ngIf="usuarioForm.get('email')?.hasError('email')">El email no es válido.</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="telefono" class="form-label">Teléfono:</label>
+      <input id="telefono" formControlName="telefono" class="form-control" />
+      <div *ngIf="usuarioForm.get('telefono')?.invalid && usuarioForm.get('telefono')?.touched" class="text-danger">
+        <div *ngIf="usuarioForm.get('telefono')?.hasError('required')">El teléfono es obligatorio.</div>
+        <div *ngIf="usuarioForm.get('telefono')?.hasError('pattern')">El teléfono solo puede contener números.</div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label for="fechaNacimiento" class="form-label">Fecha de Nacimiento:</label>
+      <input id="fechaNacimiento" formControlName="fechaNacimiento" type="date" class="form-control" />
+      <div *ngIf="usuarioForm.get('fechaNacimiento')?.invalid && usuarioForm.get('fechaNacimiento')?.touched" class="text-danger">
+        <div *ngIf="usuarioForm.get('fechaNacimiento')?.hasError('required')">La fecha de nacimiento es obligatoria.</div>
+      </div>
+    </div>
+
+    <div class="mb-3 form-check">
+      <input id="status" formControlName="status" type="checkbox" class="form-check-input" />
+      <label for="status" class="form-check-label">Estado</label>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <button type="submit" class="btn btn-primary" [disabled]="usuarioForm.invalid">{{ isEdit ? 'Actualizar' : 'Crear' }}</button>
+      <button type="button" class="btn btn-secondary" (click)="resetForm()">Cancelar</button>
+    </div>
+  </form>
+
+  <!-- Tabla de usuarios -->
+  <h2 class="mb-3">Lista de Usuarios</h2>
+  <div class="mb-3">
+    <label for="busqueda" class="form-label">Buscar Usuario:</label>
+    <input
+      id="busqueda"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearch()"
+      class="form-control"
+      placeholder="Buscar por nombre o documento..."
+    />
+  </div>
+
+  <div class="table-responsive mat-elevation-z8">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Documento</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Fecha Nacimiento</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let usuario of usuarios | paginate: { itemsPerPage: 5, currentPage: p }">
+          <td>{{ usuario.nombre }}</td>
+          <td>{{ usuario.documento }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{{ usuario.telefono }}</td>
+          <td>{{ usuario.fechaNacimiento | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ usuario.status ? 'Activo' : 'Inactivo' }}</td>
+          <td>
+            <button class="btn btn-warning btn-sm m-2" (click)="editUsuario(usuario)">Editar</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteUsuario(usuario.id!)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <pagination-controls 
+      (pageChange)="p = $event" 
+      [previousLabel]="'Anterior'" 
+      [nextLabel]="'Siguiente'" 
+      [screenReaderPaginationLabel]="'Paginación'" 
+      [screenReaderPageLabel]="'Página'" 
+      [screenReaderCurrentLabel]="'Página actual'">
+    </pagination-controls>
+  </div>
+</div>
